@@ -15,3 +15,11 @@ collections:
       - { label: "Author", name: "author", widget: "string" }
       - { label: "Date", name: "date", widget: "datetime" }
       - { label: "Tags", name: "tags", widget: "tags" }
+  - name: "highlights" # Used in routes, e.g., /admin/collections/blog
+    label: "Highlights" # Used in the UI
+    folder: "_data/books" # The path to the folder where the documents are stored
+    create: true # Allow users to create new documents in this collection
+    slug: "{{slug}}" # Filename template, e.g., YYYY-MM-DD-title.md
+    fields: # The fields for each document, usually in front matter
+      - { label: "Text", name: "text", widget: "string" }
+      - { label: "Page", name: "page", widget: "string" }

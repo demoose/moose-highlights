@@ -316,14 +316,18 @@ a.book__image {
   opacity: 0.75;
   transition: opacity 400ms;
 }
-a.book__image svg {
+a.book__image img {
+  max-width: 200px;
+  height: auto;
+  margin-bottom: 0;
   opacity: 0;
 }
 a.book__image:hover {
+  filter: none;
   opacity: 1;
 }
 @media (hover) {
-  a.book__image svg {
+  a.book__image img {
     opacity: 1;
     transition: opacity 400ms;
   }
