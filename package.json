@@ -1,0 +1,17 @@
+{
+  "name": "11ty",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@11ty/eleventy": "^1.0.0-beta.9",
+    "eleventy-plugin-svg-contents": "^0.7.0",
+    "netlify-plugin-html-validate": "^1.1.1"
+  }
+}
