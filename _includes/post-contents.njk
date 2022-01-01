@@ -4,12 +4,16 @@
   {% set current_book_title = title %}
   {% set current_book_author = author %}
   {% set current_spoilers = spoilers %}
+  {% set current_rating = rating %}
+  {% set current_progress = progress %}
 {% else %}
   {% set current_book = post.data.book %}
   {% set current_book_url = post.url %}
   {% set current_book_title = post.data.title %}
   {% set current_book_author = post.data.author %}
   {% set current_spoilers = post.data.spoilers %}
+  {% set current_rating = post.data.rating %}
+  {% set current_progress = post.data.progress %}
 {% endif %}
 
 {% set current_book_cover = '/assets/images/covers/' + current_book + '.jpg' %}
@@ -20,6 +24,12 @@
       <h1 class="book__title"><span class="book__title-small">Highlights from</span> {{ current_book_title }} by {{ current_book_author }}</h1>
     {% else %}
       <h2 class="book__title">{{ current_book_title }} by {{ current_book_author }}</h2>
+    {% endif %}
+    {% if current_rating %}
+      <span class="book__title-small">{{ current_rating }} stars</span>
+    {% endif %}
+    {% if current_progress %}
+      <span class="book__title-small">I've cooked: {{ current_progress }}</span>
     {% endif %}
     <div class="book__image">
       <img src="{{ current_book_cover | url }}" alt="Cover of {{ current_book_title }}">
