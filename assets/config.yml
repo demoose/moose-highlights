@@ -20,10 +20,11 @@ collections:
   - name: "highlights" # Used in routes, e.g., /admin/collections/blog
     extension: yaml
     label: "Highlights" # Used in the UI
-    identifier_field: slug
+    summary: '{{filename}}'
     folder: "_data/books" # The path to the folder where the documents are stored
     create: true # Allow users to create new documents in this collection
-    slug: "{{filename}}" # Filename template, e.g., YYYY-MM-DD-title.md
+    #slug: "{{filename}}" # Filename template, e.g., YYYY-MM-DD-title.md
+    widget: "list"
     fields: # The fields for each document, usually in front matter
       - { label: "Text", name: "text", widget: "string" }
       - { label: "Page", name: "page", widget: "string" }
