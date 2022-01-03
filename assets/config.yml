@@ -3,12 +3,14 @@ backend:
   branch: master # Branch to update (optional; defaults to master)
 publish_mode: editorial_workflow
 media_folder: "assets/images/covers"
+site_url: https://highlights.josephmos.es
+display_url: https://highlights.josephmos.es
 collections:
   - name: "post" # Used in routes, e.g., /admin/collections/blog
     label: "Post" # Used in the UI
     folder: "posts" # The path to the folder where the documents are stored
     create: true # Allow users to create new documents in this collection
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}" # Filename template, e.g., YYYY-MM-DD-title.md
+    slug: "{{year}}-{{month}}-{{day}}-{{book}}" # Filename template, e.g., YYYY-MM-DD-title.md
     fields: # The fields for each document, usually in front matter
       - { label: "Title", name: "title", widget: "string" }
       - { label: "Book", name: "book", widget: "string" }
@@ -18,9 +20,10 @@ collections:
   - name: "highlights" # Used in routes, e.g., /admin/collections/blog
     extension: yaml
     label: "Highlights" # Used in the UI
+    identifier_field: slug
     folder: "_data/books" # The path to the folder where the documents are stored
     create: true # Allow users to create new documents in this collection
-    slug: "{{slug}}" # Filename template, e.g., YYYY-MM-DD-title.md
+    slug: "{{filename}}" # Filename template, e.g., YYYY-MM-DD-title.md
     fields: # The fields for each document, usually in front matter
       - { label: "Text", name: "text", widget: "string" }
       - { label: "Page", name: "page", widget: "string" }
