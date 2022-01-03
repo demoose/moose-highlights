@@ -20,7 +20,7 @@ collections:
   - name: "highlights" # Used in routes, e.g., /admin/collections/blog
     extension: yaml
     label: "Highlights" # Used in the UI
-    summary: '{{filename}}'
+    identifier_field: '{{filename}}'
     folder: "_data/books" # The path to the folder where the documents are stored
     create: true # Allow users to create new documents in this collection
     #slug: "{{filename}}" # Filename template, e.g., YYYY-MM-DD-title.md
