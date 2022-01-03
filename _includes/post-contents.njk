@@ -6,6 +6,7 @@
   {% set current_spoilers = spoilers %}
   {% set current_rating = rating %}
   {% set current_progress = progress %}
+  {% set current_bookshop = bookshop %}
 {% else %}
   {% set current_book = post.data.book %}
   {% set current_book_url = post.url %}
@@ -14,6 +15,7 @@
   {% set current_spoilers = post.data.spoilers %}
   {% set current_rating = post.data.rating %}
   {% set current_progress = post.data.progress %}
+  {% set current_bookshop = post.data.bookshop %}
 {% endif %}
 
 {% set current_book_cover = '/assets/images/covers/' + current_book + '.jpg' %}
@@ -34,6 +36,9 @@
     <div class="book__image">
       <img src="{{ current_book_cover | url }}" alt="Cover of {{ current_book_title }}">
     </div>
+    {% if current_bookshop %}
+    <a href="{{current_bookshop}}">Buy this book</a>
+    {% endif %}
   </div>
 
   <section class="highlights-wrap" aria-labelledby="highlightsHeading">
