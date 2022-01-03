@@ -18,12 +18,13 @@ collections:
       - { label: "Date", name: "date", widget: "datetime" }
       - { label: "Tags", name: "tags", widget: "tags" }
   - name: "highlights" # Used in routes, e.g., /admin/collections/blog
+    format: yaml
     extension: yaml
     label: "Highlights" # Used in the UI
     identifier_field: '{{book}}'
     folder: "_data/books" # The path to the folder where the documents are stored
     create: true # Allow users to create new documents in this collection
-    #slug: "{{filename}}" # Filename template, e.g., YYYY-MM-DD-title.md
+    slug: "{{book}}" # Filename template, e.g., YYYY-MM-DD-title.md
     widget: "list"
     fields: # The fields for each document, usually in front matter
       - { label: "Book", name: "book", widget: "string" }
