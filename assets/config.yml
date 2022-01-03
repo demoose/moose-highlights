@@ -3,8 +3,8 @@ backend:
   branch: master # Branch to update (optional; defaults to master)
 publish_mode: editorial_workflow
 media_folder: "assets/images/covers"
-site_url: https://highlights.josephmos.es
-display_url: https://highlights.josephmos.es
+site_url: https://notes.josephmos.es
+display_url: https://notes.josephmos.es
 collections:
   - name: "post" # Used in routes, e.g., /admin/collections/blog
     label: "Post" # Used in the UI
