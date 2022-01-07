@@ -368,6 +368,10 @@ a.book__image:hover {
 .highlight__location {
   vertical-align: middle;
 }
+.highlight__rating {
+  vertical-align: middle;
+  margin-left: 1em;
+}
 .highlight__link {
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -381,6 +385,23 @@ a.book__image:hover {
   opacity: 0.5;
   transition: opacity 200ms;
 }
+.bookshop__link {
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  font: 1em/20px Karla, "San Francisco", "Segoe UI", "Helvetica Neue",
+    sans-serif;
+  opacity: 0.5;
+  transition: opacity 200ms;
+}
+.bookshop__link:hover,
+.bookshop__link:active,
+.bookshop__link:focus {
+  opacity: 1;
+}
+
 .highlight__link svg {
   position: absolute;
   left: 0;

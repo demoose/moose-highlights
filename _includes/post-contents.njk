@@ -37,7 +37,7 @@
       <img src="{{ current_book_cover | url }}" alt="Cover of {{ current_book_title }}">
     </div>
     {% if current_bookshop %}
-    <a href="{{current_bookshop}}">Buy this book</a>
+    <a href="{{current_bookshop}}" class="bookshop__link">Buy this book</a>
     {% endif %}
   </div>
 
@@ -61,6 +61,7 @@
           {% if highlight.attribution %}<cite class="highlight__attribution"> — {{ highlight.attribution}}</cite>{% endif %}
           <div class="highlight__meta">
             <span class="highlight__location">{{ highlight.recipe }}</span>
+            <span class="highlight__rating">{{ highlight.rating }}</span>
             <a href="{{ current_book_url | url }}#{{ highlight_perma }}" class="highlight__link">
               <svg focusable="false" aria-hidden="true" viewBox="0 0 30 20" width="30" height="20">
                 <use href="#link"></use>
