@@ -57,7 +57,8 @@
       {% for highlight in books[current_book] %}
         {% set highlight_perma = highlight.text | lower | urlencode | replace("%20", "+") | truncate(15, true, "") %}
         <li class="highlight" id="{{ highlight_perma }}">
-          <p class="highlight__text">{{ highlight.text }}</p>
+          {# {% set highlight_newline = highlight.text | replace("nl", '<br />') %} #}
+          <p class="highlight__text">{% newline highlight.text %}</p>
           {% if highlight.attribution %}<cite class="highlight__attribution"> — {{ highlight.attribution}}</cite>{% endif %}
           <div class="highlight__meta">
             <span class="highlight__location">{{ highlight.recipe }}</span>

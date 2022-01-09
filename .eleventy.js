@@ -11,6 +11,10 @@ module.exports = function (eleventyConfig) {
     yaml.safeLoad(contents)
   );
 
+  eleventyConfig.addShortcode("newline", function (highlight) {
+    return highlight.replaceAll("+n", `<br />`);
+  });
+
   // Insert SVG contents
   eleventyConfig.addPlugin(svgContents);
 
