@@ -15,7 +15,6 @@
   {% set current_spoilers = post.data.spoilers %}
   {% set current_rating = post.data.rating %}
   {% set current_progress = post.data.progress %}
-  {% set current_bookshop = post.data.bookshop %}
 {% endif %}
 
 {% set current_book_cover = '/assets/images/covers/' + current_book + '.jpg' %}
@@ -53,6 +52,7 @@
         Contains spoilers
       </p>
     {% endif %}
+
     <ul class="highlights">
       {% for highlight in books[current_book] %}
         {% set highlight_perma = highlight.text | lower | urlencode | replace("%20", "+") | truncate(15, true, "") %}
