@@ -17,7 +17,8 @@
   {% set current_progress = post.data.progress %}
 {% endif %}
 
-{% set current_book_cover = '/assets/images/covers/' + current_book + '.jpg' %}
+{% set current_book_cover_jpg = '/assets/images/covers/' + current_book + '.jpg' %}
+{% set current_book_cover_webp = '/assets/images/covers/' + current_book + '.webp' %}
 
 <article class="book">
   <div class="book__info">
@@ -33,7 +34,11 @@
       <span class="book__title-small">I've cooked: {{ current_progress }}</span>
     {% endif %}
     <div class="book__image">
-      <img src="{{ current_book_cover | url }}" alt="Cover of {{ current_book_title }}">
+      <picture>
+        <source type="image/webp" srcset="{{ current_book_cover_webp | url }}">
+        <source type="image/jpeg" srcset="{{ current_book_cover_jpg | url }}">
+        <img src="{{ current_book_cover_jpg | url }}" alt="Cover of {{ current_book_title }}">
+      </picture>
     </div>
     {% if current_bookshop %}
     <a href="{{current_bookshop}}" class="bookshop__link">Buy this book (UK)</a>
