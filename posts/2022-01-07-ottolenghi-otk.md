@@ -5,7 +5,7 @@ author: Ottolenghi Test Kitchen
 spoilers: false
 date: Last Modified
 rating: 4
-progress: 5/87
+progress: 6/87
 bookshop: https://uk.bookshop.org/books/ottolenghi-test-kitchen-shelf-love/9781529109481?aid=9613
 coffee: false
 ---
