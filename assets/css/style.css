@@ -535,4 +535,8 @@ a.book__image:hover {
 .pagination__newer:hover {
   opacity: 1;
 }
+
+p.highlight__text {
+  padding: 0.2rem;
+}
 /*# sourceMappingURL=style.css.map */

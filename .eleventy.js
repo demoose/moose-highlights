@@ -12,7 +12,7 @@ module.exports = function (eleventyConfig) {
   );
 
   eleventyConfig.addShortcode("newline", function (highlight) {
-    return highlight.replaceAll("+n", `<br />`);
+    return highlight.replaceAll("+n", `<p class="highlight__text">`);
   });
 
   // Insert SVG contents
