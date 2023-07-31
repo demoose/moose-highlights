@@ -10,10 +10,17 @@
 }
 
 body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   padding: 2em;
   font: 400 100%/1.4 $font-body;
   color: $color-body;
   background: $color-bg;
+}
+
+main {
+  flex: 1;
 }
 
 :focus {
@@ -22,16 +29,17 @@ body {
 }
 
 ::selection {
-	background: #fff;
-	color: #000;
+  background: #fff;
+  color: #000;
 }
 
 ::-moz-selection {
-	background: #fff;
-	color: #000;
+  background: #fff;
+  color: #000;
 }
 
-a:link, a:visited {
+a:link,
+a:visited {
   text-decoration: none;
   color: #fff;
 }
@@ -51,7 +59,12 @@ a:hover {
  *	---------------------------------------------
  */
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: inherit;
   font-size: 1em;
 }
@@ -91,8 +104,10 @@ ul {
   position: absolute !important;
 }
 
-.clear:after, .clear::after,
-.row:after, .row::after {
+.clear:after,
+.clear::after,
+.row:after,
+.row::after {
   content: "";
   display: table;
   clear: both;
@@ -130,7 +145,7 @@ button {
   border: 0;
   outline: 0;
   background: transparent;
-  
+
   &:hover {
     cursor: pointer;
   }

@@ -4,11 +4,17 @@
   box-sizing: border-box;
 }
 body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   padding: 2em;
   font: 400 100%/1.4 Karla, "San Francisco", "Segoe UI", "Helvetica Neue",
     sans-serif;
   color: #d2d2d2;
   background: #000;
+}
+main {
+  flex: 1;
 }
 :focus {
   outline: 1px dotted #fff;
@@ -174,8 +180,14 @@ button:hover {
   max-width: 100em;
 }
 .site-footer {
-  margin: 0 auto 4em;
   font-size: 0.825em;
+  margin: 2em auto 4em;
+  max-width: 36em;
+  position: relative;
+  z-index: 3;
+}
+.site-footer p + p {
+  margin-top: 1em;
 }
 .site-footer a {
   border-bottom: 1px solid;
@@ -188,7 +200,7 @@ button:hover {
   font-size: inherit;
 }
 @supports (pointer-events: none) {
-  .page-wrap: :after {
+  .page-wrap::after {
     display: block;
     content: "";
     position: absolute;
@@ -207,7 +219,7 @@ button:hover {
     padding: 0 6em;
   }
   .site-footer {
-    text-align: center;
+    margin: 4em auto;
   }
 }
 @supports (animation-fill-mode: forwards) {
@@ -316,18 +328,23 @@ a.book__image {
   opacity: 0.75;
   transition: opacity 400ms;
 }
-a.book__image img {
-  max-width: 200px;
-  height: auto;
-  margin-bottom: 0;
+a.book__image svg {
   opacity: 0;
 }
 a.book__image:hover {
-  filter: none;
   opacity: 1;
 }
+a.book__buy {
+  border-bottom: 1px solid;
+  font-family: "Sorts Mill Goudy", "Goudy Old Style", "Garamond", serif;
+  font-size: 1rem;
+}
+a.book__buy:hover {
+  background-color: #fff;
+  color: #000;
+}
 @media (hover) {
-  a.book__image img {
+  a.book__image svg {
     opacity: 1;
     transition: opacity 400ms;
   }
@@ -368,10 +385,6 @@ a.book__image:hover {
 .highlight__location {
   vertical-align: middle;
 }
-.highlight__rating {
-  vertical-align: middle;
-  margin-left: 1em;
-}
 .highlight__link {
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -385,23 +398,6 @@ a.book__image:hover {
   opacity: 0.5;
   transition: opacity 200ms;
 }
-.bookshop__link {
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  display: inline-block;
-  vertical-align: middle;
-  position: relative;
-  font: 1em/20px Karla, "San Francisco", "Segoe UI", "Helvetica Neue",
-    sans-serif;
-  opacity: 0.5;
-  transition: opacity 200ms;
-}
-.bookshop__link:hover,
-.bookshop__link:active,
-.bookshop__link:focus {
-  opacity: 1;
-}
-
 .highlight__link svg {
   position: absolute;
   left: 0;
@@ -535,8 +531,14 @@ a.book__image:hover {
 .pagination__newer:hover {
   opacity: 1;
 }
-
-p.highlight__text {
-  padding: 0.2rem;
+.error-msg {
+  margin: 2em auto 0;
+  max-width: 24em;
 }
-/*# sourceMappingURL=style.css.map */
+.error-msg a:link,
+.error-msg a:visited {
+  border-bottom: 1px solid;
+}
+.error-msg a:hover {
+  border-bottom-style: dashed;
+} /*# sourceMappingURL=style.css.map */

@@ -6,6 +6,6 @@ spoilers: false
 date: Last Modified
 rating: 4
 progress: 7/87
-bookshop: https://uk.bookshop.org/books/ottolenghi-test-kitchen-shelf-love/9781529109481?aid=9613
+bookshop: 9781529109481
 coffee: false
 ---

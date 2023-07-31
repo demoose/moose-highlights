@@ -27,7 +27,7 @@
 .highlight__meta,
 .spoilers-note {
   color: $color-secondary;
-  font: .75em/1.2 $font-body;
+  font: 0.75em/1.2 $font-body;
   @include all-caps();
 }
 
@@ -45,7 +45,7 @@
 }
 
 a.book__image {
-  opacity: .75;
+  opacity: 0.75;
   transition: opacity 400ms;
 
   svg {
@@ -54,6 +54,17 @@ a.book__image {
 
   &:hover {
     opacity: 1;
+  }
+}
+
+a.book__buy {
+  border-bottom: 1px solid;
+  font-family: $font-secondary;
+  font-size: 1rem;
+
+  &:hover {
+    background-color: #fff;
+    color: #000;
   }
 }
 
@@ -87,7 +98,7 @@ a.book__image {
 .spoilers-note__icon {
   display: inline-block;
   vertical-align: middle;
-  margin-right: .25em;
+  margin-right: 0.25em;
 }
 
 .highlight {
@@ -101,9 +112,9 @@ a.book__image {
 
 .highlight__attribution {
   display: block;
-  margin: .5em 0;
+  margin: 0.5em 0;
   @include all-caps();
-  font-size: .875em;
+  font-size: 0.875em;
   font-style: normal;
 }
 
@@ -117,11 +128,11 @@ a.book__image {
   vertical-align: middle;
   position: relative;
   margin-left: 1em;
-  padding: .5em .5em .5em 36px;
+  padding: 0.5em 0.5em 0.5em 36px;
   font: 1em/20px $font-body;
-  opacity: .5;
+  opacity: 0.5;
   transition: opacity 200ms;
-  
+
   svg {
     position: absolute;
     left: 0;
@@ -138,7 +149,7 @@ a.book__image {
     opacity: 1;
 
     span {
-      opacity: .75;
+      opacity: 0.75;
     }
   }
 }
@@ -148,7 +159,7 @@ a.book__image {
     position: relative;
     z-index: 1;
     vertical-align: middle;
-    padding: .125em .25em;
+    padding: 0.125em 0.25em;
     background: #ebebeb;
     color: #2b2b2b;
     line-height: 1.6;
@@ -160,7 +171,7 @@ a.book__image {
   z-index: 2;
   border: 1px solid transparent;
   border-radius: 0;
-  padding: .5em;
+  padding: 0.5em;
 
   &::after {
     display: block;
@@ -168,7 +179,7 @@ a.book__image {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%,-50%);
+    transform: translate(-50%, -50%);
     width: 2.75rem;
     height: 2.75rem;
   }
@@ -178,7 +189,7 @@ a.book__image {
   }
 
   &:active {
-    background-color: rgba(255,255,255,.5);
+    background-color: rgba(255, 255, 255, 0.5);
   }
 }
 
@@ -199,7 +210,7 @@ a.book__image {
   }
 
   .book__title-small {
-    font-size: .66em;
+    font-size: 0.66em;
   }
 
   .book__info {

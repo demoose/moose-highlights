@@ -15,6 +15,7 @@
   {% set current_spoilers = post.data.spoilers %}
   {% set current_rating = post.data.rating %}
   {% set current_progress = post.data.progress %}
+  {% set current_bookshop = post.data.bookshop %}
 {% endif %}
 
 {% set current_book_cover_jpg = '/assets/images/covers/' + current_book + '.jpg' %}
@@ -40,8 +41,8 @@
         <img src="{{ current_book_cover_jpg | url }}" alt="Cover of {{ current_book_title }}">
       </picture>
     </div>
-    {% if current_bookshop %}
-    <a href="{{current_bookshop}}" class="bookshop__link">Buy this book (UK)</a>
+        {% if current_bookshop %}
+      <a class="book__buy" href="https://uk.bookshop.org/a/9613/{{ current_bookshop }}">Buy {% if not individualPost %}“{{ current_book_title }}” {% endif %}on Bookshop</a>
     {% endif %}
   </div>
 

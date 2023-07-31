@@ -3,9 +3,9 @@
  *	---------------------------------------------
  */
 
- /* FONTS */
- $font-body: Karla, 'San Francisco', 'Segoe UI', 'Helvetica Neue', sans-serif;
- $font-secondary: 'Sorts Mill Goudy', 'Goudy Old Style', 'Garamond', serif;
+/* FONTS */
+$font-body: Karla, "San Francisco", "Segoe UI", "Helvetica Neue", sans-serif;
+$font-secondary: "Sorts Mill Goudy", "Goudy Old Style", "Garamond", serif;
 
 /* BREAKPOINTS */
 $bp-xs: 25em;
@@ -19,7 +19,7 @@ $bp-xxl: 100em;
 $margin-l: 2.5em;
 $margin-m: 1.5em;
 $margin-s: 1em;
-$margin-xs: .5em;
+$margin-xs: 0.5em;
 
 /* COLORS */
 $color-bg: #000;
@@ -34,11 +34,11 @@ $color-secondary: #a2a2a2;
 
 @mixin all-caps() {
   text-transform: uppercase;
-  letter-spacing: .03em;
+  letter-spacing: 0.03em;
 }
 
 @mixin pseudo() {
   display: block;
-  content: '';
+  content: "";
   position: absolute;
 }
