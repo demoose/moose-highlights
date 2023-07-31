@@ -60,7 +60,7 @@
     {% endif %}
 
     <ul class="highlights">
-      {% for highlight in books[current_book] %}
+      {% for highlight in books[current_book].notes %}
         {% set highlight_perma = highlight.text | lower | urlencode | replace("%20", "+") | truncate(15, true, "") %}
         <li class="highlight" id="{{ highlight_perma }}">
           <p class="highlight__text">{% newline highlight.text %}</p>

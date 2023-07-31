@@ -313,6 +313,11 @@ button:hover {
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
+
+.highlight__rating {
+  vertical-align: middle;
+  margin-left: 1em;
+}
 .book__title-small {
   display: block;
   margin-bottom: 1em;
