@@ -5,5 +5,5 @@ author: Hetty McKinnon
 date: Last Modified
 rating: 5
 progress: 7/120
-bookshop: https://uk.bookshop.org/books/to-asia-with-love-everyday-asian-recipes-and-stories-from-the-heart/9783791386836?aid=9613
+bookshop: 9783791386836
 ---
