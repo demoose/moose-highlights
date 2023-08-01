@@ -82,6 +82,11 @@ export default defineConfig({
             name: "notes",
             type: "object",
             list: true,
+            ui: {
+              itemProps: (item) => {
+                return { label: `${item?.recipe}` };
+              },
+            },
             fields: [
               {
                 type: "string",
