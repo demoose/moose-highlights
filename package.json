@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx @11ty/eleventy --serve",
-    "tina-dev": "tinacms dev -c \"npx @11ty/eleventy --serve\""
+    "tina-dev": "tinacms dev -c \"npx @11ty/eleventy --serve\"",
+    "build": "tinacms build && npx @11ty/eleventy"
   },
   "keywords": [],
   "author": "",

@@ -7,9 +7,7 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("README.md");
 
   // Keep highlight data files working after conversion from Jekyll
-  eleventyConfig.addDataExtension("yaml", (contents) =>
-    yaml.safeLoad(contents)
-  );
+  eleventyConfig.addDataExtension("yaml", (contents) => yaml.load(contents));
 
   eleventyConfig.addShortcode("newline", function (highlight) {
     return highlight.replaceAll("+n", `<p class="highlight__text">`);
