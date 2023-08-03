@@ -343,6 +343,7 @@ a.book__buy {
   border-bottom: 1px solid;
   font-family: "Sorts Mill Goudy", "Goudy Old Style", "Garamond", serif;
   font-size: 1rem;
+  display: inline-block;
 }
 a.book__buy:hover {
   background-color: #fff;

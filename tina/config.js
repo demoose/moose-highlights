@@ -69,6 +69,18 @@ export default defineConfig({
             label: "Bookshop ID",
             required: true,
           },
+          {
+            type: "image",
+            name: "jpeg",
+            label: "JPEG Cover",
+            required: true,
+          },
+          {
+            type: "image",
+            name: "webp",
+            label: "WEBP Cover",
+            required: true,
+          },
         ],
       },
       {

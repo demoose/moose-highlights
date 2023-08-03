@@ -3,9 +3,12 @@ title: OTK Shelf Love
 book: ottolenghi-otk
 author: Ottolenghi Test Kitchen
 spoilers: false
-date: Last Modified
+date: 2023-08-02T23:00:00.000Z
 rating: 4
 progress: 7/87
 bookshop: 9781529109481
 coffee: false
+jpeg: /assets/images/covers/ottolenghi-otk.jpg
+webp: /assets/images/covers/ottolenghi-otk.webp
 ---
+
