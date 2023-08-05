@@ -40,7 +40,7 @@
       <picture>
         <source type="image/webp" srcset="{{ current_webp | url }}">
         <source type="image/jpeg" srcset="{{ current_jpeg | url }}">
-        <img src="{{ current_jpeg | url }}" alt="Cover of {{ current_book_title }}">
+        <img src="{{ current_jpeg | url }}" alt="Cover of {{ current_book_title }}" width="240px">
       </picture>
     </div>
         {% if current_bookshop %}
