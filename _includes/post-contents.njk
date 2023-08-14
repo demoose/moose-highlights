@@ -7,7 +7,7 @@
   {% set current_rating = rating %}
   {% set current_progress = progress %}
   {% set current_bookshop = bookshop %}
-  {% set current_jpeg = jpeg %}
+  {% set current_png = png %}
   {% set current_webp = webp %}
 {% else %}
   {% set current_book = post.data.book %}
@@ -18,7 +18,7 @@
   {% set current_rating = post.data.rating %}
   {% set current_progress = post.data.progress %}
   {% set current_bookshop = post.data.bookshop %}
-  {% set current_jpeg = post.data.jpeg %}
+  {% set current_png = post.data.png %}
   {% set current_webp = post.data.webp %}
 {% endif %}
 
@@ -39,8 +39,8 @@
     <div class="book__image">
       <picture>
         <source type="image/webp" srcset="{{ current_webp | url }}">
-        <source type="image/jpeg" srcset="{{ current_jpeg | url }}">
-        <img src="{{ current_jpeg | url }}" alt="Cover of {{ current_book_title }}" width="240px">
+        <source type="image/png" srcset="{{ current_png | url }}">
+        <img src="{{ current_png | url }}" alt="Cover of {{ current_book_title }}" width="240px">
       </picture>
     </div>
         {% if current_bookshop %}

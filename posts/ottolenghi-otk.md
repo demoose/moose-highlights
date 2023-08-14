@@ -8,7 +8,7 @@ rating: 4
 progress: 7/87
 bookshop: 9781529109481
 coffee: false
-jpeg: /assets/images/covers/ottolenghi-otk.jpg
+png: /assets/images/covers/ottolenghi-otk.png
 webp: /assets/images/covers/ottolenghi-otk.webp
 ---
 

@@ -7,13 +7,13 @@
   {% for post in posts %}
     <li class="cover">
       {% set current_book = post.data.book %}
-      {% set current_cover_jpg = post.data.jpeg %}
+      {% set current_cover_png = post.data.png %}
       {% set current_cover_webp = post.data.webp %}
       <a href="{{ post.url | url }}" class="book__image" data-bgSrc="{{ current_cover | url }}" title="{{ post.data.title }}">
         <picture>
           <source type="image/webp" srcset="{{ current_cover_webp | url }}">
-          <source type="image/jpeg" srcset="{{ current_cover_jpg | url }}">
-          <img src="{{ current_cover_jpg | url }}" alt="Cover of {{current_book}}" width="240px">
+          <source type="image/png" srcset="{{ current_cover_png | url }}">
+          <img src="{{ current_cover_png | url }}" alt="Cover of {{current_book}}" width="240px">
       </picture>
       </a>
     </li>

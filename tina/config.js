@@ -71,8 +71,8 @@ export default defineConfig({
           },
           {
             type: "image",
-            name: "jpeg",
-            label: "JPEG Cover",
+            name: "png",
+            label: "PNG Cover",
             required: true,
           },
           {
