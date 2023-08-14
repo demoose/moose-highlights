@@ -1,12 +1,3 @@
-// Load hi-fi covers
-var covers = document.querySelectorAll(".book__image");
-for (var i = 0; i < covers.length; i++) {
-  if (covers[i].hasAttribute("data-bgSrc")) {
-    covers[i].style.backgroundImage =
-      'url("' + covers[i].getAttribute("data-bgSrc") + '")';
-  }
-}
-
 // Make highlight stand out when permalinked
 var activateHighlight = function (hash) {
   var highlight = document.getElementById(hash);
@@ -18,7 +9,6 @@ var activateHighlight = function (hash) {
         "<span>" +
         highlightText.innerHTML +
         '</span> <button id="js-clearHighlight" class="btn--clear" title="Clear highlight permalink"><svg focusable="false" viewBox="0 0 20 20" width="20" height="20"><use href="#clear"></use></svg></button>';
-      //svg4everybody();
       break;
     }
   }
@@ -33,7 +23,6 @@ var smoothUpdateURL = function (hash, highlight) {
     var hashlessURL = window.location.href.slice(0, hashIndex);
   }
   highlight.scrollIntoView({ behavior: "smooth" });
-  console.log(highlight);
   history.replaceState(null, null, hashlessURL + "#" + hash);
 };
 
@@ -89,6 +78,3 @@ var clickClear = function (e) {
 };
 
 window.addEventListener("click", clickClear, false);
-
-// Polyfil for SVG sprites
-//svg4everybody();
