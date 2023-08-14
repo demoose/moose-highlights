@@ -63,7 +63,7 @@
 
     <ul class="highlights">
       {% for highlight in books[current_book].notes %}
-        {% set highlight_perma = highlight.text | lower | urlencode | replace("%20", "+") | truncate(15, true, "") %}
+        {% set highlight_perma = highlight.recipe | lower | urlencode | replace("%20", "+")  %}
         <li class="highlight" id="{{ highlight_perma }}">
           <p class="highlight__text">{% newline highlight.text %}</p>
           {% if highlight.attribution %}<cite class="highlight__attribution"> — {{ highlight.attribution}}</cite>{% endif %}

@@ -10,6 +10,7 @@ body {
   padding: 2em;
   font: 400 100%/1.4 Karla, "San Francisco", "Segoe UI", "Helvetica Neue",
     sans-serif;
+  font-display: swap;
   color: #d2d2d2;
   background: #000;
 }
@@ -303,6 +304,7 @@ button:hover {
 .book__title {
   margin-bottom: 1em;
   font: 1.166em/1.2 "Sorts Mill Goudy", "Goudy Old Style", "Garamond", serif;
+  font-display: swap;
 }
 .book__title-small,
 .highlight__meta,
@@ -310,6 +312,7 @@ button:hover {
   color: #a2a2a2;
   font: 0.75em/1.2 Karla, "San Francisco", "Segoe UI", "Helvetica Neue",
     sans-serif;
+  font-display: swap;
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
@@ -342,6 +345,7 @@ a.book__image:hover {
 a.book__buy {
   border-bottom: 1px solid;
   font-family: "Sorts Mill Goudy", "Goudy Old Style", "Garamond", serif;
+  font-display: swap;
   font-size: 1rem;
   display: inline-block;
 }
@@ -401,6 +405,7 @@ a.book__buy:hover {
   padding: 0.5em 0.5em 0.5em 36px;
   font: 1em/20px Karla, "San Francisco", "Segoe UI", "Helvetica Neue",
     sans-serif;
+  font-display: swap;
   opacity: 0.5;
   transition: opacity 200ms;
 }
@@ -422,7 +427,7 @@ a.book__buy:hover {
 .highlight__link:focus span {
   opacity: 0.75;
 }
-.highlight--active .highlight__text span {
+.highlight--active .highlight__text mark {
   position: relative;
   z-index: 1;
   vertical-align: middle;

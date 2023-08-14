@@ -2,16 +2,38 @@
 var activateHighlight = function (hash) {
   var highlight = document.getElementById(hash);
   highlight.className += " highlight--active";
-  for (var i = 0; i < highlight.childNodes.length; i++) {
-    if (highlight.childNodes[i].className == "highlight__text") {
-      var highlightText = highlight.childNodes[i];
+  let highlightList = highlight.querySelectorAll(
+    (className = ".highlight__text")
+  );
+
+  for (let i = 0; i < highlightList.length; i++) {
+    let highlightText = highlightList[i];
+    if (i === highlightList.length - 1) {
       highlightText.innerHTML =
-        "<span>" +
+        "<mark>" +
         highlightText.innerHTML +
-        '</span> <button id="js-clearHighlight" class="btn--clear" title="Clear highlight permalink"><svg focusable="false" viewBox="0 0 20 20" width="20" height="20"><use href="#clear"></use></svg></button>';
-      break;
+        `</mark> <button id="js-clearHighlight" class="btn--clear" title="Clear highlight permalink"><svg focusable="false" viewBox="0 0 20 20" width="20" height="20"><use href="#clear"></use></svg></button>`;
+    } else {
+      highlightText.innerHTML = "<mark>" + highlightText.innerHTML + "</mark> ";
     }
   }
+  // for (var i = 0; i < highlight.childNodes.length; i++) {
+  //   if (highlight.childNodes[i].className == "highlight__text") {
+  //     if (i == highlight.childNodes.length - 1) {
+  //       var highlightText = highlight.childNodes[i];
+  //       highlightText.innerHTML =
+  //         "<mark>" +
+  //         highlightText.innerHTML +
+  //         `</mark> <button id="js-clearHighlight" class="btn--clear" title="Clear highlight permalink"><svg focusable="false" viewBox="0 0 20 20" width="20" height="20"><use href="#clear"></use></svg></button>`;
+  //       highlightText.innerHTML =
+  //         "<mark>" + highlightText.innerHTML + "</mark> ";
+  //     } else {
+  //       var highlightText = highlight.childNodes[i];
+  //       highlightText.innerHTML =
+  //         "<mark>" + highlightText.innerHTML + "</mark> ";
+  //     }
+  //   }
+  // }
   highlight.focus();
 };
 
@@ -29,9 +51,11 @@ var smoothUpdateURL = function (hash, highlight) {
 var removeHighlight = function () {
   var highlighted = document.querySelector(".highlight--active");
   if (highlighted !== null) {
-    var highlightText = highlighted.querySelector(".highlight__text");
+    var highlightTextNodes = highlighted.querySelectorAll(".highlight__text");
     highlighted.className = "highlight";
-    highlightText.innerHTML = highlightText.innerText;
+    for (let i = 0; i < highlightTextNodes.length; i++) {
+      highlightTextNodes[i].innerHTML = highlightTextNodes[i].innerText;
+    }
     if (document.getElementById("js-clearHighlight")) {
       this.remove();
     }
