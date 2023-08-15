@@ -5,7 +5,12 @@
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width" />
-  <meta name="description" content="{{ site.description }}">
+  {% if book %}
+    <meta name="description" content="Notes and tweaks from {{ title }} by {{ author }}">
+  {% else %}
+    <meta name="description" content="{{ site.description }}">
+  {% endif %}
+
   <meta name="robots" content="index, follow">
 
 
@@ -19,17 +24,26 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:site" content="{{ site.twitter }}">
   <meta name="twitter:title" content="{% if title %}{{ title | escape }} | {% endif %} {{ site.url | url }}">
-  <meta name="twitter:description" content="{{ site.description }}">
+  {% if book %}
+    <meta name="twitter:description" content="Notes and tweaks from {{ title }} by {{ author }}">
+  {% else %}
+    <meta name="twitter:description" content="{{ site.description }}">
+  {% endif %}
 
   <meta name="og:url" content="{{ site.url }}{{ url }}">
   <meta name="og:title" content="{% if title %}{{ title | escape }} | {% endif %} {{ site.url | url }}">
-  <meta name="og:description" content="Some snippets I thought worth highlighting and saving for later">
+  
+  {% if book %}
+    <meta name="og:description" content="Notes and tweaks from {{ title }} by {{ author }}">
+  {% else %}
+    <meta name="og:description" content="{{ site.description }}">
+  {% endif %}
 
   {% if book %}
-    {% set book_cover = book.data.png %}
-    <meta name="twitter:image:src" content="{{ book_cover | url }}">
+    {% set book_cover = png %}
+    <meta name="twitter:image:src" content="{{site.url}}{{ book_cover}}{{ url }}">
     <meta name="twitter:image:alt" content="Cover of {{ title }}">
-    <meta name="og:image" content="{{ book_cover | url }}">
+    <meta name="og:image" content="{{site.url}}{{ book_cover}}{{ url }}">
   {% else %}
     <meta name="twitter:image:src" content="{{ '/assets/images/share-icon.png' | url }}">
     <meta name="og:image" content="{{ '/assets/images/share-icon.png' | url }}">
