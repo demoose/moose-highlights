@@ -52,15 +52,7 @@
     {% if individualPost %}
       <h2 class="u-vis-hidden" id="highlightsHeading">Notes from this book</h2>
     {% endif %}
-    {% if current_spoilers == true %}
-      <p class="spoilers-note" {% if individualPost %}role="alert"{% endif %}>
-        <svg class="spoilers-note__icon" focusable="false" aria-hidden="true" viewBox="0 0 14 20" width="14" height="20">
-          <use href="#spoilers"></use>
-        </svg>
-        Contains spoilers
-      </p>
-    {% endif %}
-
+    
     <ul class="highlights">
       {% for highlight in books[current_book].notes %}
         {% set highlight_perma = highlight.recipe | lower | urlencode | replace("%20", "+")  %}
