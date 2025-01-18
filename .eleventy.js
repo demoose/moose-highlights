@@ -1,5 +1,6 @@
 const yaml = require("js-yaml");
 const svgContents = require("eleventy-plugin-svg-contents");
+const UpgradeHelper = require("@11ty/eleventy-upgrade-help");
 
 module.exports = function (eleventyConfig) {
   // Don't try to build pages from these files
@@ -15,6 +16,7 @@ module.exports = function (eleventyConfig) {
 
   // Insert SVG contents
   eleventyConfig.addPlugin(svgContents);
+  eleventyConfig.addPlugin(UpgradeHelper);
 
   return {
     /* Change value if you'd like to deploy to subdirectory, e.g. "/highlights/"
