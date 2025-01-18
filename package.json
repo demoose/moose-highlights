@@ -13,7 +13,6 @@
   "license": "ISC",
   "dependencies": {
     "@11ty/eleventy": "^3.0.0",
-    "@11ty/eleventy-upgrade-help": "^3.0.1",
     "eleventy-plugin-svg-contents": "^0.7.0",
     "netlify-plugin-html-validate": "^1.1.1"
   },

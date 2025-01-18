@@ -16,7 +16,6 @@ module.exports = function (eleventyConfig) {
 
   // Insert SVG contents
   eleventyConfig.addPlugin(svgContents);
-  eleventyConfig.addPlugin(UpgradeHelper);
 
   return {
     /* Change value if you'd like to deploy to subdirectory, e.g. "/highlights/"
