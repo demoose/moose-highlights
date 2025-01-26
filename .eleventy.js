@@ -1,6 +1,5 @@
 const yaml = require("js-yaml");
 const svgContents = require("eleventy-plugin-svg-contents");
-const UpgradeHelper = require("@11ty/eleventy-upgrade-help");
 
 module.exports = function (eleventyConfig) {
   // Don't try to build pages from these files
