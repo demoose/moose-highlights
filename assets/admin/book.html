@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Details - Cookbook CMS</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <div class="admin-container">
+    <header class="admin-header">
+      <div class="header-left">
+        <a href="index.html" class="back-link">← Back to Books</a>
+        <h1 id="bookTitle">Book Details</h1>
+      </div>
+      <div class="header-actions">
+        <button id="editBookBtn" class="btn btn-secondary">Edit Book</button>
+        <button id="deleteBookBtn" class="btn btn-danger">Delete Book</button>
+      </div>
+    </header>
+
+    <main class="admin-main book-detail">
+      <section class="book-info" id="bookInfo">
+        <!-- Book info will be loaded here -->
+      </section>
+
+      <section class="notes-section">
+        <div class="notes-header">
+          <h2>Recipe Notes</h2>
+          <button id="addNoteBtn" class="btn btn-primary">+ Add Note</button>
+        </div>
+        <div class="notes-list" id="notesList">
+          <!-- Notes will be loaded here -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Edit Book Modal -->
+    <div class="modal" id="bookModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Edit Book Details</h2>
+          <button class="modal-close" id="closeBookModal">&times;</button>
+        </div>
+        <form id="bookForm">
+          <div class="form-group">
+            <label for="bookTitleInput">Title*</label>
+            <input type="text" id="bookTitleInput" name="title" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="bookAuthor">Author*</label>
+            <input type="text" id="bookAuthor" name="author" required>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bookRating">Rating</label>
+              <select id="bookRating" name="rating">
+                <option value="">-</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="bookProgress">Progress</label>
+              <input type="text" id="bookProgress" name="progress">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="bookBookshop">Bookshop ISBN/URL</label>
+            <input type="text" id="bookBookshop" name="bookshop">
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="cancelBookBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Add/Edit Note Modal -->
+    <div class="modal" id="noteModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="noteModalTitle">Add Recipe Note</h2>
+          <button class="modal-close" id="closeNoteModal">&times;</button>
+        </div>
+        <form id="noteForm">
+          <input type="hidden" id="noteIndex" value="">
+          
+          <div class="form-group">
+            <label for="noteRecipe">Recipe Name*</label>
+            <input type="text" id="noteRecipe" name="recipe" required 
+                   placeholder="e.g., Jackfruit Biryani">
+          </div>
+          
+          <div class="form-group">
+            <label for="noteRating">Rating</label>
+            <input type="text" id="noteRating" name="rating" 
+                   placeholder="e.g., 4.5/5">
+          </div>
+          
+          <div class="form-group">
+            <label for="noteText">Notes</label>
+            <textarea id="noteText" name="text" rows="8" 
+                      placeholder="Your notes about this recipe...&#10;&#10;Use +n for paragraph breaks (as per your existing format)"></textarea>
+            <small>Use <code>+n</code> for paragraph breaks within your notes.</small>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="cancelNoteBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Note</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Toast notifications -->
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script src="js/book.js"></script>
+</body>
+</html>

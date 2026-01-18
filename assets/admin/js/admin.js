@@ -1,0 +1,163 @@
+// Admin Dashboard JavaScript
+
+const API_BASE = '/api';
+
+// DOM Elements
+const booksGrid = document.getElementById('booksGrid');
+const addBookBtn = document.getElementById('addBookBtn');
+const bookModal = document.getElementById('bookModal');
+const bookForm = document.getElementById('bookForm');
+const closeModal = document.getElementById('closeModal');
+const cancelBtn = document.getElementById('cancelBtn');
+const modalTitle = document.getElementById('modalTitle');
+const formMode = document.getElementById('formMode');
+const toast = document.getElementById('toast');
+
+// State
+let books = [];
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  loadBooks();
+  setupEventListeners();
+});
+
+// Event Listeners
+function setupEventListeners() {
+  addBookBtn.addEventListener('click', () => openAddModal());
+  closeModal.addEventListener('click', () => closeModalHandler());
+  cancelBtn.addEventListener('click', () => closeModalHandler());
+  bookForm.addEventListener('submit', handleFormSubmit);
+  
+  // Close modal on backdrop click
+  bookModal.addEventListener('click', (e) => {
+    if (e.target === bookModal) closeModalHandler();
+  });
+}
+
+// Load Books
+async function loadBooks() {
+  booksGrid.innerHTML = '<div class="loading">Loading books...</div>';
+  
+  try {
+    const response = await fetch(`${API_BASE}/books`);
+    books = await response.json();
+    renderBooks();
+  } catch (error) {
+    console.error('Error loading books:', error);
+    booksGrid.innerHTML = '<div class="empty-state">Failed to load books. Is the server running?</div>';
+  }
+}
+
+// Render Books Grid
+function renderBooks() {
+  if (books.length === 0) {
+    booksGrid.innerHTML = `
+      <div class="empty-state">
+        <p>No books yet. Add your first cookbook!</p>
+      </div>
+    `;
+    return;
+  }
+  
+  booksGrid.innerHTML = books.map(book => `
+    <article class="book-card" onclick="navigateToBook('${book.slug}')">
+      <img 
+        class="book-card-cover" 
+        src="${book.webp || book.png || '/assets/images/covers/placeholder.png'}" 
+        alt="Cover of ${book.title}"
+        onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23334155%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%2394a3b8%22 font-size=%2212%22>No Cover</text></svg>'"
+      >
+      <div class="book-card-content">
+        <h3 class="book-card-title">${book.title}</h3>
+        <p class="book-card-author">${book.author}</p>
+        <div class="book-card-meta">
+          ${book.rating ? `<span>⭐ ${book.rating}</span>` : ''}
+          ${book.progress ? `<span>📖 ${book.progress}</span>` : ''}
+          <span>📝 ${book.notesCount || 0} notes</span>
+        </div>
+      </div>
+    </article>
+  `).join('');
+}
+
+// Navigate to book detail page
+function navigateToBook(slug) {
+  window.location.href = `book.html?slug=${slug}`;
+}
+
+// Open Add Modal
+function openAddModal() {
+  formMode.value = 'add';
+  modalTitle.textContent = 'Add New Book';
+  bookForm.reset();
+  document.getElementById('bookSlug').disabled = false;
+  bookModal.classList.add('active');
+}
+
+// Close Modal
+function closeModalHandler() {
+  bookModal.classList.remove('active');
+  bookForm.reset();
+}
+
+// Handle Form Submit
+async function handleFormSubmit(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(bookForm);
+  const slug = formData.get('slug');
+  const coverFile = document.getElementById('bookCover').files[0];
+  
+  const bookData = {
+    slug,
+    title: formData.get('title'),
+    author: formData.get('author'),
+    rating: formData.get('rating'),
+    progress: formData.get('progress'),
+    bookshop: formData.get('bookshop')
+  };
+  
+  try {
+    // Create book
+    const response = await fetch(`${API_BASE}/books`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bookData)
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to create book');
+    }
+    
+    // Upload cover if provided
+    if (coverFile) {
+      const coverFormData = new FormData();
+      coverFormData.append('cover', coverFile);
+      coverFormData.append('slug', slug);
+      
+      await fetch(`${API_BASE}/upload-cover`, {
+        method: 'POST',
+        body: coverFormData
+      });
+    }
+    
+    showToast('Book created successfully!', 'success');
+    closeModalHandler();
+    loadBooks();
+  } catch (error) {
+    console.error('Error creating book:', error);
+    showToast(error.message, 'error');
+  }
+}
+
+// Toast Notification
+function showToast(message, type = 'info') {
+  toast.textContent = message;
+  toast.className = `toast ${type} show`;
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
