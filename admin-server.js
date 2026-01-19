@@ -69,6 +69,18 @@ function generateFrontmatter(data) {
   return yaml;
 }
 
+// Helper: Normalize slug (lowercase, hyphenated, no special chars)
+function slugify(text) {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')        // Replace spaces with hyphens
+    .replace(/[^a-z0-9-]/g, '')  // Remove non-alphanumeric chars except hyphens
+    .replace(/-+/g, '-')         // Replace multiple hyphens with single
+    .replace(/^-|-$/g, '');      // Remove leading/trailing hyphens
+}
+
 // GET /api/books - List all books
 app.get('/api/books', async (req, res) => {
   try {
@@ -127,10 +139,18 @@ app.get('/api/books/:slug', async (req, res) => {
 // POST /api/books - Create new book
 app.post('/api/books', async (req, res) => {
   try {
-    const { slug, title, author, rating, progress, bookshop } = req.body;
+    const { title, author, rating, progress, bookshop } = req.body;
+    let { slug } = req.body;
     
     if (!slug || !title || !author) {
       return res.status(400).json({ error: 'slug, title, and author are required' });
+    }
+    
+    // Normalize slug to lowercase with hyphens
+    slug = slugify(slug);
+    
+    if (!slug) {
+      return res.status(400).json({ error: 'Invalid slug - must contain alphanumeric characters' });
     }
     
     // Check if book already exists
