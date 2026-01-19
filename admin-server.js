@@ -3,6 +3,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const yaml = require('js-yaml');
 const multer = require('multer');
+const sharp = require('sharp');
 
 const app = express();
 const PORT = 3001;
@@ -17,18 +18,19 @@ app.use(express.json());
 app.use('/admin', express.static(path.join(__dirname, 'assets', 'admin')));
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
-// Configure multer for image uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, COVERS_DIR);
-  },
-  filename: (req, file, cb) => {
-    const slug = req.body.slug || 'book';
-    const ext = path.extname(file.originalname);
-    cb(null, `${slug}${ext}`);
+// Configure multer for image uploads (memory storage for processing)
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed.'));
+    }
   }
 });
-const upload = multer({ storage });
 
 // Helper: Parse markdown frontmatter
 function parseFrontmatter(content) {
@@ -344,13 +346,51 @@ app.post('/api/upload-cover', upload.single('cover'), async (req, res) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
     
+    const slug = req.body.slug;
+    if (!slug) {
+      return res.status(400).json({ error: 'Slug is required' });
+    }
+    
+    const pngPath = path.join(COVERS_DIR, `${slug}.png`);
+    const webpPath = path.join(COVERS_DIR, `${slug}.webp`);
+    
+    // Process image with sharp
+    const imageBuffer = req.file.buffer;
+    
+    // Create optimized PNG (max 800px width, quality optimization)
+    await sharp(imageBuffer)
+      .resize(800, null, { 
+        withoutEnlargement: true,
+        fit: 'inside'
+      })
+      .png({ 
+        quality: 85,
+        compressionLevel: 9
+      })
+      .toFile(pngPath);
+    
+    // Create optimized WebP (max 800px width, good quality/size balance)
+    await sharp(imageBuffer)
+      .resize(800, null, { 
+        withoutEnlargement: true,
+        fit: 'inside'
+      })
+      .webp({ 
+        quality: 80,
+        effort: 6
+      })
+      .toFile(webpPath);
+    
+    console.log(`✅ Cover images created: ${slug}.png and ${slug}.webp`);
+    
     res.json({ 
-      message: 'Cover uploaded',
-      path: `/assets/images/covers/${req.file.filename}`
+      message: 'Cover uploaded and optimized',
+      png: `/assets/images/covers/${slug}.png`,
+      webp: `/assets/images/covers/${slug}.webp`
     });
   } catch (error) {
     console.error('Error uploading cover:', error);
-    res.status(500).json({ error: 'Failed to upload cover' });
+    res.status(500).json({ error: 'Failed to upload cover: ' + error.message });
   }
 });
 
