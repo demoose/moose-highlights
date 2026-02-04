@@ -1,5 +1,4 @@
 const yaml = require("js-yaml");
-const svgContents = require("eleventy-plugin-svg-contents");
 
 module.exports = function (eleventyConfig) {
   // Don't try to build pages from these files
@@ -12,9 +11,6 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addShortcode("newline", function (highlight) {
     return highlight.replaceAll("+n", `<p class="highlight__text">`);
   });
-
-  // Insert SVG contents
-  eleventyConfig.addPlugin(svgContents);
 
   return {
     /* Change value if you'd like to deploy to subdirectory, e.g. "/highlights/"

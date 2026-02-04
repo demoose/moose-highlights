@@ -14,7 +14,6 @@
   "license": "ISC",
   "dependencies": {
     "@11ty/eleventy": "^3.0.0",
-    "eleventy-plugin-svg-contents": "^0.7.0",
     "express": "^4.21.0",
     "js-yaml": "^4.1.0",
     "multer": ">=2.0.2",
