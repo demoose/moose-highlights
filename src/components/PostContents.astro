@@ -1,0 +1,98 @@
+---
+interface Note {
+  recipe: string;
+  rating?: string | number;
+  text?: string;
+  attribution?: string;
+}
+
+interface BookData {
+  title: string;
+  author: string;
+  rating?: string | number;
+  progress?: string;
+  bookshop?: string | number;
+  png: string;
+  webp: string;
+  notes?: Note[];
+}
+
+interface Props {
+  data: BookData;
+  individualPost?: boolean;
+  bookUrl: string;
+}
+
+const { data, individualPost = false, bookUrl } = Astro.props;
+
+function highlightId(recipe: string): string {
+  return encodeURIComponent(recipe.toLowerCase()).replace(/%20/g, '+');
+}
+
+function splitParagraphs(text?: string): string[] {
+  if (!text) return [];
+  return text
+    .split(/\n\n+/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+const notes = (data.notes ?? []).filter((note) => note?.recipe);
+---
+<article class="book">
+  <div class="book__info">
+    {individualPost ? (
+      <h1 class="book__title"><span class="book__title-small">Notes from</span> {data.title} by {data.author}</h1>
+    ) : (
+      <h2 class="book__title">{data.title} by {data.author}</h2>
+    )}
+
+    {data.rating && <span class="book__title-small">{data.rating} stars</span>}
+    {data.progress && <span class="book__title-small">I've cooked: {data.progress}</span>}
+
+    <div class="book__image">
+      <picture>
+        <source type="image/webp" srcset={data.webp} />
+        <source type="image/png" srcset={data.png} />
+        <img src={data.png} alt={`Cover of ${data.title}`} width="240" />
+      </picture>
+    </div>
+
+    {data.bookshop && (
+      <a class="book__buy" href={`https://uk.bookshop.org/a/9613/${data.bookshop}`}>
+        Buy {!individualPost && `"${data.title}" `}on Bookshop
+      </a>
+    )}
+  </div>
+
+  <section class="highlights-wrap" aria-labelledby={individualPost ? 'highlightsHeading' : undefined}>
+    {individualPost && <h2 class="u-vis-hidden" id="highlightsHeading">Notes from this book</h2>}
+
+    <ul class="highlights">
+      {notes.map((note) => {
+        const id = highlightId(note.recipe);
+        const paragraphs = splitParagraphs(note.text);
+
+        return (
+          <li class="highlight" id={id}>
+            {paragraphs.map((paragraph) => (
+              <p class="highlight__text">{paragraph}</p>
+            ))}
+            {note.attribution && <cite class="highlight__attribution"> - {note.attribution}</cite>}
+            <div class="highlight__meta">
+              <span class="highlight__location">{note.recipe}</span>
+              {note.rating && <span class="highlight__rating">{note.rating}</span>}
+              <a href={`${bookUrl}#${id}`} class="highlight__link">
+                <svg focusable="false" aria-hidden="true" viewBox="0 0 30 20" width="30" height="20">
+                  <use href="#link"></use>
+                </svg>
+                <span>Link</span>
+                <span class="u-vis-hidden">to {note.recipe} note</span>
+              </a>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  </section>
+</article>

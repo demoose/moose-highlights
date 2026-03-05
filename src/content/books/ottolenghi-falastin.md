@@ -1,0 +1,32 @@
+---
+title: Falastin
+author: Sami Tamimi and Tara Wigley
+spoilers: false
+date: 2023-08-02T23:00:00.000Z
+rating: 4
+progress: 1/120
+bookshop: 9781785038723
+png: /assets/images/covers/ottolenghi-falastin.png
+webp: /assets/images/covers/ottolenghi-falastin.webp
+notes:
+  - text: |-
+      SUBS - Nido instead of normal milk, caramel sugar (caramel that's pulverised into dust), and no egg-wash.
+
+      I've made these twice now and in my eyes they are the perfect accompaniment to a hot drink. The sweetness is heavily offset by the richness of the tahini.
+
+      I found the dough quite bready and stodgy as apposed to light and fluffy like a cinammon bun, and there was no way I was getting the swirls like in the demo photo.
+
+      I'm remaking these with milk-bread as the dough and leaving them un-squished to rise and puff out naturally, and will see how they turn out.
+    recipe: Sweet tahini rolls
+    rating: 4/5
+  - text: |-
+      So, I remade the sweet tahini rolls, still with caramel sugar, and still with nido. This time I used the milk bread recipe from 'Mooncakes and Milk Bread'. And, I didn't flatten the rolls, as suggested. I rolled and left them to rest.
+
+      The result was a light fluffy bun, where the taste of the filling shined through significantly more.
+
+      My big self-criticism with this would be that I wasn't patient enough to let the rolls rise again to a puff, like they normally do. Though I wonder whether that was ever going to happen with shards of caramel inhibiting the expansion and gluten formation required.
+
+      Next time I'll try a longer rise and use normal sugar. After that I'll trial a normal cinammon bun recipe.
+    recipe: Sweet Tahini Rolls - Milk Bread Edition
+    rating: 4/5
+---

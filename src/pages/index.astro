@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Pagination from '../components/Pagination.astro';
+
+const pageSize = 24;
+const books = (await getCollection('books')).sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+const pageData = books.slice(0, pageSize);
+const page = {
+  url: {
+    prev: undefined,
+    next: books.length > pageSize ? '/2/' : undefined,
+  },
+};
+---
+<BaseLayout title="Browse by book">
+  <h1 class="u-vis-hidden">Explore all books</h1>
+
+  <ul class="covers">
+    {pageData.map((entry) => (
+      <li class="cover">
+        <a href={`/book/${entry.id}/`} class="book__image" title={entry.data.title}>
+          <picture>
+            <source type="image/webp" srcset={entry.data.webp} />
+            <source type="image/png" srcset={entry.data.png} />
+            <img src={entry.data.png} alt={`Cover of ${entry.data.title}`} width="240" />
+          </picture>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <Pagination page={page} />
+</BaseLayout>

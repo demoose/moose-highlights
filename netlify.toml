@@ -1,5 +1,18 @@
-[[plugins]]
-  package = "netlify-plugin-html-validate"
+[build]
+  command = "pnpm build"
+  publish = "dist"
 
-  [plugins.inputs]
-    config = ".htmlvalidate.json"
+[[redirects]]
+  from = "/all/page:page"
+  to = "/all/:page/"
+  status = 301
+
+[[redirects]]
+  from = "/page:page"
+  to = "/:page/"
+  status = 301
+
+[[redirects]]
+  from = "/404"
+  to = "/404.html"
+  status = 404

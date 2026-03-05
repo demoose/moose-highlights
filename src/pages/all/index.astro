@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Pagination from '../../components/Pagination.astro';
+import PostContents from '../../components/PostContents.astro';
+
+const pageSize = 10;
+const books = (await getCollection('books')).sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+const pageData = books.slice(0, pageSize);
+const page = {
+  url: {
+    prev: undefined,
+    next: books.length > pageSize ? '/all/2/' : undefined,
+  },
+};
+---
+<BaseLayout title="All notes">
+  <h1 class="u-vis-hidden">Notes from all books</h1>
+
+  {pageData.map((entry) => (
+    <PostContents data={entry.data} bookUrl={`/book/${entry.id}/`} />
+  ))}
+
+  <Pagination page={page} />
+</BaseLayout>

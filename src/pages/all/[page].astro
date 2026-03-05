@@ -1,0 +1,24 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Pagination from '../../components/Pagination.astro';
+import PostContents from '../../components/PostContents.astro';
+
+export async function getStaticPaths({ paginate }) {
+  const books = await getCollection('books');
+  const sorted = books.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+  const pages = paginate(sorted, { pageSize: 10 });
+  return pages.filter((entry) => entry.params.page !== '1');
+}
+
+const { page } = Astro.props;
+---
+<BaseLayout title="All notes">
+  <h1 class="u-vis-hidden">Notes from all books</h1>
+
+  {page.data.map((entry) => (
+    <PostContents data={entry.data} bookUrl={`/book/${entry.id}/`} />
+  ))}
+
+  <Pagination page={page} />
+</BaseLayout>

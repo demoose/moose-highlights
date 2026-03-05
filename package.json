@@ -1,28 +1,32 @@
 {
-  "name": "11ty",
+  "name": "cook-notes",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx @11ty/eleventy --serve",
-    "build": "npx @11ty/eleventy",
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
     "admin": "node admin-server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@11ty/eleventy": "^3.0.0",
+    "@astrojs/netlify": "^6.0.0",
+    "astro": "^5.0.0",
     "express": "^4.21.0",
     "js-yaml": "^4.1.0",
     "multer": ">=2.0.2",
-    "netlify-plugin-html-validate": "^1.1.1",
     "sharp": "^0.33.0"
   },
-  "overrides": {
-    "netlify-plugin-html-validate": {
-      "html-validate": "^10.0.0"
-    }
-  }
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9"
+  },
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "sharp"
+    ]
+  },
+  "packageManager": "pnpm@10.30.0+sha512.2b5753de015d480eeb88f5b5b61e0051f05b4301808a82ec8b840c9d2adf7748eb352c83f5c1593ca703ff1017295bc3fdd3119abb9686efc96b9fcb18200937"
 }

@@ -1,0 +1,33 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Pagination from '../components/Pagination.astro';
+
+export async function getStaticPaths({ paginate }) {
+  const books = await getCollection('books');
+  const sorted = books.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+  const pages = paginate(sorted, { pageSize: 24 });
+  return pages.filter((entry) => entry.params.page !== '1');
+}
+
+const { page } = Astro.props;
+---
+<BaseLayout title="Browse by book">
+  <h1 class="u-vis-hidden">Explore all books</h1>
+
+  <ul class="covers">
+    {page.data.map((entry) => (
+      <li class="cover">
+        <a href={`/book/${entry.id}/`} class="book__image" title={entry.data.title}>
+          <picture>
+            <source type="image/webp" srcset={entry.data.webp} />
+            <source type="image/png" srcset={entry.data.png} />
+            <img src={entry.data.png} alt={`Cover of ${entry.data.title}`} width="240" />
+          </picture>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <Pagination page={page} />
+</BaseLayout>

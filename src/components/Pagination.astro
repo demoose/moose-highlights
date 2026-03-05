@@ -1,0 +1,30 @@
+---
+interface PageUrls {
+  prev?: string;
+  next?: string;
+}
+
+interface Props {
+  page: {
+    url: PageUrls;
+  };
+}
+
+const { page } = Astro.props;
+---
+<nav class="pagination" aria-label="pagination">
+  {page.url.next && (
+    <a class="pagination__older" href={page.url.next} title="Older posts">
+      <svg focusable="false" viewBox="0 0 30 30" width="30" height="30">
+        <use href="#older"></use>
+      </svg>
+    </a>
+  )}
+  {page.url.prev && (
+    <a class="pagination__newer" href={page.url.prev} title="Newer posts">
+      <svg focusable="false" viewBox="0 0 30 30" width="30" height="30">
+        <use href="#newer"></use>
+      </svg>
+    </a>
+  )}
+</nav>

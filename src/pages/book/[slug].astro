@@ -1,0 +1,25 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostContents from '../../components/PostContents.astro';
+
+export async function getStaticPaths() {
+  const books = await getCollection('books');
+  return books.map((book) => ({ params: { slug: book.id } }));
+}
+
+const { slug } = Astro.params;
+if (!slug) {
+  throw new Error('Missing slug parameter');
+}
+
+const entry = await getEntry('books', slug);
+if (!entry) {
+  throw new Error(`Book not found: ${slug}`);
+}
+
+const bookUrl = `/book/${entry.id}/`;
+---
+<BaseLayout title={entry.data.title} book={{ title: entry.data.title, author: entry.data.author, png: entry.data.png }}>
+  <PostContents data={entry.data} individualPost={true} bookUrl={bookUrl} />
+</BaseLayout>

@@ -6,416 +6,421 @@ const multer = require('multer');
 const sharp = require('sharp');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
+const ADMIN_SECRET = process.env.ADMIN_SECRET;
 
-// Paths
-const POSTS_DIR = path.join(__dirname, 'posts');
-const BOOKS_DATA_DIR = path.join(__dirname, '_data', 'books');
-const COVERS_DIR = path.join(__dirname, 'assets', 'images', 'covers');
+// ─── Paths ────────────────────────────────────────────────────────────────────
 
-// Middleware
+const CONTENT_DIR = path.join(__dirname, 'src', 'content', 'books');
+const COVERS_DIR  = path.join(__dirname, 'public', 'assets', 'images', 'covers');
+const ASSETS_DIR  = path.join(__dirname, 'public', 'assets');
+const ADMIN_DIR   = path.join(ASSETS_DIR, 'admin');
+
+// ─── Middleware ───────────────────────────────────────────────────────────────
+
 app.use(express.json());
-app.use('/admin', express.static(path.join(__dirname, 'assets', 'admin')));
-app.use('/assets', express.static(path.join(__dirname, 'assets')));
+app.use('/admin', express.static(ADMIN_DIR));
+app.use('/assets', express.static(ASSETS_DIR));
 
-// Configure multer for image uploads (memory storage for processing)
-const upload = multer({ 
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed.'));
-    }
+// Auth — only enforced when ADMIN_SECRET env var is set.
+// Set it before exposing the server beyond localhost.
+app.use('/api', (req, res, next) => {
+  if (!ADMIN_SECRET) return next();
+  if (req.headers['x-admin-secret'] !== ADMIN_SECRET) {
+    return res.status(401).json({ error: 'Unauthorized' });
   }
+  next();
 });
 
-// Helper: Parse markdown frontmatter
-function parseFrontmatter(content) {
-  const match = content.match(/^---\n([\s\S]*?)\n---/);
-  if (!match) return { data: {}, content: '' };
-  
-  const frontmatter = {};
-  const lines = match[1].split('\n');
-  for (const line of lines) {
-    const colonIndex = line.indexOf(':');
-    if (colonIndex > 0) {
-      const key = line.slice(0, colonIndex).trim();
-      let value = line.slice(colonIndex + 1).trim();
-      // Remove quotes if present
-      if ((value.startsWith('"') && value.endsWith('"')) || 
-          (value.startsWith("'") && value.endsWith("'"))) {
-        value = value.slice(1, -1);
-      }
-      frontmatter[key] = value;
-    }
-  }
-  
-  const bodyContent = content.slice(match[0].length).trim();
-  return { data: frontmatter, content: bodyContent };
+// ─── Logging ──────────────────────────────────────────────────────────────────
+
+const LOG_FILE = path.join(__dirname, 'admin-server.log');
+
+async function log(msg) {
+  const entry = `[${new Date().toISOString()}] ${msg}\n`;
+  process.stdout.write(entry);
+  await fs.appendFile(LOG_FILE, entry).catch(() => {});
 }
 
-// Helper: Generate markdown frontmatter
-function generateFrontmatter(data) {
-  let yaml = '---\n';
-  for (const [key, value] of Object.entries(data)) {
-    if (value !== undefined && value !== null && value !== '') {
-      yaml += `${key}: ${value}\n`;
-    }
-  }
-  yaml += '---\n\n';
-  return yaml;
+// ─── Image upload ─────────────────────────────────────────────────────────────
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (_req, file, cb) => {
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (allowed.includes(file.mimetype)) return cb(null, true);
+    cb(new Error('Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed.'));
+  },
+});
+
+// ─── Frontmatter helpers ──────────────────────────────────────────────────────
+
+/**
+ * Parse frontmatter from a markdown file.
+ * Uses js-yaml — not a hand-rolled parser.
+ */
+function parseFrontmatter(fileContent) {
+  const match = fileContent.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!match) return { data: {}, body: '' };
+  return {
+    data: yaml.load(match[1]) ?? {},
+    body: fileContent.slice(match[0].length).trim(),
+  };
 }
 
-// Helper: Normalize slug (lowercase, hyphenated, no special chars)
+/**
+ * Serialize data back to a .md file with a YAML frontmatter block.
+ */
+function serializeMd(data, body = '') {
+  const front = yaml.dump(data, { lineWidth: -1, quotingType: '"', forceQuotes: false });
+  return `---\n${front}---\n${body ? `\n${body}\n` : ''}`;
+}
+
+// ─── Slug helper ──────────────────────────────────────────────────────────────
+
 function slugify(text) {
   return text
     .toString()
     .toLowerCase()
     .trim()
-    .replace(/\s+/g, '-')        // Replace spaces with hyphens
-    .replace(/[^a-z0-9-]/g, '')  // Remove non-alphanumeric chars except hyphens
-    .replace(/-+/g, '-')         // Replace multiple hyphens with single
-    .replace(/^-|-$/g, '');      // Remove leading/trailing hyphens
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
 }
 
-// GET /api/books - List all books
-app.get('/api/books', async (req, res) => {
+function isValidSlug(slug) {
+  return typeof slug === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
+}
+
+function validateSlugOrRespond(slug, res) {
+  if (isValidSlug(slug)) return true;
+  res.status(400).json({ error: 'Invalid slug' });
+  return false;
+}
+
+// ─── File path helper ─────────────────────────────────────────────────────────
+
+function bookPath(slug) {
+  return path.join(CONTENT_DIR, `${slug}.md`);
+}
+
+async function logStartupPathState() {
   try {
-    const files = await fs.readdir(POSTS_DIR);
+    await fs.access(CONTENT_DIR);
+    await log(`   ✅ Content directory: ${CONTENT_DIR}`);
+  } catch {
+    await log(`   ⚠️  Content directory missing: ${CONTENT_DIR}`);
+  }
+
+  try {
+    await fs.mkdir(COVERS_DIR, { recursive: true });
+    await log(`   ✅ Covers directory ready: ${COVERS_DIR}`);
+  } catch (err) {
+    await log(`   ⚠️  Could not prepare covers directory (${COVERS_DIR}): ${err.message}`);
+  }
+
+  try {
+    await fs.access(ADMIN_DIR);
+    await log(`   ✅ Admin directory: ${ADMIN_DIR}`);
+  } catch {
+    await log(`   ⚠️  Admin directory missing: ${ADMIN_DIR}`);
+  }
+}
+
+// ─── Health ───────────────────────────────────────────────────────────────────
+
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// ─── GET /api/books ───────────────────────────────────────────────────────────
+
+app.get('/api/books', async (_req, res) => {
+  try {
+    const files = await fs.readdir(CONTENT_DIR);
     const books = [];
-    
+
     for (const file of files) {
-      if (file.endsWith('.md') && !file.startsWith('.')) {
-        const content = await fs.readFile(path.join(POSTS_DIR, file), 'utf-8');
-        const { data } = parseFrontmatter(content);
-        const slug = file.replace('.md', '');
-        
-        // Count notes from YAML file
-        let notesCount = 0;
-        try {
-          const yamlPath = path.join(BOOKS_DATA_DIR, `${data.book || slug}.yaml`);
-          const yamlContent = await fs.readFile(yamlPath, 'utf-8');
-          const yamlData = yaml.load(yamlContent);
-          notesCount = yamlData?.notes?.filter(n => n.recipe)?.length || 0;
-        } catch (e) {
-          // YAML file may not exist yet
-        }
-        
-        books.push({
-          slug,
-          ...data,
-          notesCount
-        });
-      }
+      if (!file.endsWith('.md') || file.startsWith('.')) continue;
+      const content = await fs.readFile(path.join(CONTENT_DIR, file), 'utf-8');
+      const { data } = parseFrontmatter(content);
+      const slug = file.replace(/\.md$/, '');
+      books.push({
+        slug,
+        ...data,
+        notesCount: data.notes?.filter(n => n.recipe)?.length ?? 0,
+      });
     }
-    
-    // Sort by date, newest first
+
     books.sort((a, b) => new Date(b.date) - new Date(a.date));
     res.json(books);
-  } catch (error) {
-    console.error('Error listing books:', error);
+  } catch (err) {
+    await log(`ERROR GET /api/books: ${err.message}`);
     res.status(500).json({ error: 'Failed to list books' });
   }
 });
 
-// GET /api/books/:slug - Get single book
+// ─── GET /api/books/:slug ─────────────────────────────────────────────────────
+
 app.get('/api/books/:slug', async (req, res) => {
   try {
     const { slug } = req.params;
-    const mdPath = path.join(POSTS_DIR, `${slug}.md`);
-    const content = await fs.readFile(mdPath, 'utf-8');
+    if (!validateSlugOrRespond(slug, res)) return;
+    const content = await fs.readFile(bookPath(slug), 'utf-8');
     const { data } = parseFrontmatter(content);
-    
     res.json({ slug, ...data });
-  } catch (error) {
-    console.error('Error getting book:', error);
+  } catch {
     res.status(404).json({ error: 'Book not found' });
   }
 });
 
-// POST /api/books - Create new book
+// ─── POST /api/books ──────────────────────────────────────────────────────────
+
 app.post('/api/books', async (req, res) => {
   try {
-    const { title, author, rating, progress, bookshop } = req.body;
-    let { slug } = req.body;
-    
-    if (!slug || !title || !author) {
-      return res.status(400).json({ error: 'slug, title, and author are required' });
+    let { slug, title, author, rating, progress, bookshop } = req.body;
+
+    if (!title || !author) {
+      return res.status(400).json({ error: 'title and author are required' });
     }
-    
-    // Normalize slug to lowercase with hyphens
-    slug = slugify(slug);
-    
+
+    slug = slugify(slug || title);
     if (!slug) {
-      return res.status(400).json({ error: 'Invalid slug - must contain alphanumeric characters' });
+      return res.status(400).json({ error: 'Could not derive a valid slug' });
     }
-    
-    // Check if book already exists
-    const mdPath = path.join(POSTS_DIR, `${slug}.md`);
+
+    const filePath = bookPath(slug);
     try {
-      await fs.access(mdPath);
-      return res.status(409).json({ error: 'Book with this slug already exists' });
-    } catch (e) {
-      // File doesn't exist, good to proceed
+      await fs.access(filePath);
+      return res.status(409).json({ error: `Book "${slug}" already exists` });
+    } catch {
+      // Expected — file doesn't exist yet
     }
-    
-    // Create markdown file
-    const frontmatter = {
+
+    const data = {
       title,
-      book: slug,
       author,
       date: new Date().toISOString(),
-      rating: rating || '',
-      progress: progress || '',
-      bookshop: bookshop || '',
-      png: `/assets/images/covers/${slug}.png`,
-      webp: `/assets/images/covers/${slug}.webp`
+      ...(rating    ? { rating }    : {}),
+      ...(progress  ? { progress }  : {}),
+      ...(bookshop  ? { bookshop }  : {}),
+      png:  `/assets/images/covers/${slug}.png`,
+      webp: `/assets/images/covers/${slug}.webp`,
+      notes: [],
     };
-    
-    await fs.writeFile(mdPath, generateFrontmatter(frontmatter));
-    
-    // Create YAML file with empty notes
-    const yamlPath = path.join(BOOKS_DATA_DIR, `${slug}.yaml`);
-    const yamlContent = yaml.dump({ notes: [] });
-    await fs.writeFile(yamlPath, yamlContent);
-    
+
+    await fs.writeFile(filePath, serializeMd(data), 'utf-8');
+    await log(`Created book: ${slug}`);
     res.status(201).json({ message: 'Book created', slug });
-  } catch (error) {
-    console.error('Error creating book:', error);
+  } catch (err) {
+    await log(`ERROR POST /api/books: ${err.message}`);
     res.status(500).json({ error: 'Failed to create book' });
   }
 });
 
-// PUT /api/books/:slug - Update book
+// ─── PUT /api/books/:slug ─────────────────────────────────────────────────────
+
 app.put('/api/books/:slug', async (req, res) => {
   try {
     const { slug } = req.params;
+    if (!validateSlugOrRespond(slug, res)) return;
     const { title, author, rating, progress, bookshop } = req.body;
-    
-    const mdPath = path.join(POSTS_DIR, `${slug}.md`);
-    const content = await fs.readFile(mdPath, 'utf-8');
-    const { data } = parseFrontmatter(content);
-    
-    // Update frontmatter
-    const updatedData = {
-      ...data,
-      title: title || data.title,
-      author: author || data.author,
-      rating: rating !== undefined ? rating : data.rating,
-      progress: progress !== undefined ? progress : data.progress,
-      bookshop: bookshop !== undefined ? bookshop : data.bookshop
-    };
-    
-    await fs.writeFile(mdPath, generateFrontmatter(updatedData));
+
+    const filePath = bookPath(slug);
+    const content = await fs.readFile(filePath, 'utf-8');
+    const { data, body } = parseFrontmatter(content);
+
+    // Merge — only update fields that were explicitly provided
+    if (title    !== undefined) data.title    = title;
+    if (author   !== undefined) data.author   = author;
+    if (rating   !== undefined) data.rating   = rating;
+    if (progress !== undefined) data.progress = progress;
+    if (bookshop !== undefined) data.bookshop = bookshop;
+
+    await fs.writeFile(filePath, serializeMd(data, body), 'utf-8');
+    await log(`Updated book: ${slug}`);
     res.json({ message: 'Book updated', slug });
-  } catch (error) {
-    console.error('Error updating book:', error);
-    res.status(500).json({ error: 'Failed to update book' });
+  } catch (err) {
+    await log(`ERROR PUT /api/books/${req.params.slug}: ${err.message}`);
+    res.status(err.code === 'ENOENT' ? 404 : 500).json({ error: 'Failed to update book' });
   }
 });
 
-// DELETE /api/books/:slug - Delete book
+// ─── DELETE /api/books/:slug ──────────────────────────────────────────────────
+
 app.delete('/api/books/:slug', async (req, res) => {
   try {
     const { slug } = req.params;
-    
-    // Delete markdown file
-    const mdPath = path.join(POSTS_DIR, `${slug}.md`);
-    await fs.unlink(mdPath);
-    
-    // Delete YAML file
-    try {
-      const yamlPath = path.join(BOOKS_DATA_DIR, `${slug}.yaml`);
-      await fs.unlink(yamlPath);
-    } catch (e) {
-      // YAML file may not exist
+    if (!validateSlugOrRespond(slug, res)) return;
+
+    await fs.unlink(bookPath(slug));
+
+    // Best-effort cover cleanup
+    for (const ext of ['png', 'webp']) {
+      await fs.unlink(path.join(COVERS_DIR, `${slug}.${ext}`)).catch(() => {});
     }
-    
-    // Optionally delete cover images
-    try {
-      await fs.unlink(path.join(COVERS_DIR, `${slug}.png`));
-      await fs.unlink(path.join(COVERS_DIR, `${slug}.webp`));
-    } catch (e) {
-      // Cover images may not exist
-    }
-    
+
+    await log(`Deleted book: ${slug}`);
     res.json({ message: 'Book deleted', slug });
-  } catch (error) {
-    console.error('Error deleting book:', error);
-    res.status(500).json({ error: 'Failed to delete book' });
+  } catch (err) {
+    await log(`ERROR DELETE /api/books/${req.params.slug}: ${err.message}`);
+    res.status(err.code === 'ENOENT' ? 404 : 500).json({ error: 'Failed to delete book' });
   }
 });
 
-// GET /api/books/:slug/notes - Get notes for a book
+// ─── GET /api/books/:slug/notes ───────────────────────────────────────────────
+
 app.get('/api/books/:slug/notes', async (req, res) => {
   try {
     const { slug } = req.params;
-    const yamlPath = path.join(BOOKS_DATA_DIR, `${slug}.yaml`);
-    
-    try {
-      const content = await fs.readFile(yamlPath, 'utf-8');
-      const data = yaml.load(content);
-      res.json(data?.notes || []);
-    } catch (e) {
-      // File doesn't exist, return empty array
-      res.json([]);
-    }
-  } catch (error) {
-    console.error('Error getting notes:', error);
-    res.status(500).json({ error: 'Failed to get notes' });
+    if (!validateSlugOrRespond(slug, res)) return;
+    const content = await fs.readFile(bookPath(slug), 'utf-8');
+    const { data } = parseFrontmatter(content);
+    res.json(data.notes ?? []);
+  } catch {
+    res.status(404).json({ error: 'Book not found' });
   }
 });
 
-// POST /api/books/:slug/notes - Add a note
+// ─── POST /api/books/:slug/notes ─────────────────────────────────────────────
+
 app.post('/api/books/:slug/notes', async (req, res) => {
   try {
     const { slug } = req.params;
+    if (!validateSlugOrRespond(slug, res)) return;
     const { text, recipe, rating } = req.body;
-    
+
     if (!recipe) {
       return res.status(400).json({ error: 'recipe is required' });
     }
-    
-    const yamlPath = path.join(BOOKS_DATA_DIR, `${slug}.yaml`);
-    let data = { notes: [] };
-    
-    try {
-      const content = await fs.readFile(yamlPath, 'utf-8');
-      data = yaml.load(content) || { notes: [] };
-    } catch (e) {
-      // File doesn't exist, create new
-    }
-    
-    if (!data.notes) data.notes = [];
-    
-    const newNote = {
-      text: text || '',
-      recipe,
-      rating: rating || ''
-    };
-    
+
+    const filePath = bookPath(slug);
+    const content = await fs.readFile(filePath, 'utf-8');
+    const { data, body } = parseFrontmatter(content);
+
+    if (!Array.isArray(data.notes)) data.notes = [];
+
+    const newNote = { recipe, ...(rating ? { rating } : {}), ...(text ? { text } : {}) };
     data.notes.push(newNote);
-    await fs.writeFile(yamlPath, yaml.dump(data, { lineWidth: -1 }));
-    
+
+    await fs.writeFile(filePath, serializeMd(data, body), 'utf-8');
+    await log(`Added note to ${slug}: "${recipe}"`);
     res.status(201).json({ message: 'Note added', index: data.notes.length - 1 });
-  } catch (error) {
-    console.error('Error adding note:', error);
-    res.status(500).json({ error: 'Failed to add note' });
+  } catch (err) {
+    await log(`ERROR POST /api/books/${req.params.slug}/notes: ${err.message}`);
+    res.status(err.code === 'ENOENT' ? 404 : 500).json({ error: 'Failed to add note' });
   }
 });
 
-// PUT /api/books/:slug/notes/:index - Edit a note
+// ─── PUT /api/books/:slug/notes/:index ───────────────────────────────────────
+
 app.put('/api/books/:slug/notes/:index', async (req, res) => {
   try {
     const { slug, index } = req.params;
-    const { text, recipe, rating } = req.body;
+    if (!validateSlugOrRespond(slug, res)) return;
     const noteIndex = parseInt(index, 10);
-    
-    const yamlPath = path.join(BOOKS_DATA_DIR, `${slug}.yaml`);
-    const content = await fs.readFile(yamlPath, 'utf-8');
-    const data = yaml.load(content);
-    
-    if (!data?.notes?.[noteIndex]) {
+    const { text, recipe, rating } = req.body;
+
+    const filePath = bookPath(slug);
+    const content = await fs.readFile(filePath, 'utf-8');
+    const { data, body } = parseFrontmatter(content);
+
+    if (!data.notes?.[noteIndex]) {
       return res.status(404).json({ error: 'Note not found' });
     }
-    
+
+    const existing = data.notes[noteIndex];
     data.notes[noteIndex] = {
-      text: text !== undefined ? text : data.notes[noteIndex].text,
-      recipe: recipe !== undefined ? recipe : data.notes[noteIndex].recipe,
-      rating: rating !== undefined ? rating : data.notes[noteIndex].rating
+      recipe:  recipe  !== undefined ? recipe  : existing.recipe,
+      ...(rating !== undefined
+        ? (rating ? { rating } : {})
+        : (existing.rating ? { rating: existing.rating } : {})),
+      ...(text !== undefined
+        ? (text ? { text } : {})
+        : (existing.text ? { text: existing.text } : {})),
     };
-    
-    await fs.writeFile(yamlPath, yaml.dump(data, { lineWidth: -1 }));
+
+    await fs.writeFile(filePath, serializeMd(data, body), 'utf-8');
+    await log(`Updated note ${noteIndex} in ${slug}`);
     res.json({ message: 'Note updated' });
-  } catch (error) {
-    console.error('Error updating note:', error);
-    res.status(500).json({ error: 'Failed to update note' });
+  } catch (err) {
+    await log(`ERROR PUT /api/books/${req.params.slug}/notes/${req.params.index}: ${err.message}`);
+    res.status(err.code === 'ENOENT' ? 404 : 500).json({ error: 'Failed to update note' });
   }
 });
 
-// DELETE /api/books/:slug/notes/:index - Delete a note
+// ─── DELETE /api/books/:slug/notes/:index ────────────────────────────────────
+
 app.delete('/api/books/:slug/notes/:index', async (req, res) => {
   try {
     const { slug, index } = req.params;
+    if (!validateSlugOrRespond(slug, res)) return;
     const noteIndex = parseInt(index, 10);
-    
-    const yamlPath = path.join(BOOKS_DATA_DIR, `${slug}.yaml`);
-    const content = await fs.readFile(yamlPath, 'utf-8');
-    const data = yaml.load(content);
-    
-    if (!data?.notes?.[noteIndex]) {
+
+    const filePath = bookPath(slug);
+    const content = await fs.readFile(filePath, 'utf-8');
+    const { data, body } = parseFrontmatter(content);
+
+    if (!data.notes?.[noteIndex]) {
       return res.status(404).json({ error: 'Note not found' });
     }
-    
-    data.notes.splice(noteIndex, 1);
-    await fs.writeFile(yamlPath, yaml.dump(data, { lineWidth: -1 }));
+
+    const removed = data.notes.splice(noteIndex, 1)[0];
+    await fs.writeFile(filePath, serializeMd(data, body), 'utf-8');
+    await log(`Deleted note ${noteIndex} ("${removed.recipe}") from ${slug}`);
     res.json({ message: 'Note deleted' });
-  } catch (error) {
-    console.error('Error deleting note:', error);
-    res.status(500).json({ error: 'Failed to delete note' });
+  } catch (err) {
+    await log(`ERROR DELETE /api/books/${req.params.slug}/notes/${req.params.index}: ${err.message}`);
+    res.status(err.code === 'ENOENT' ? 404 : 500).json({ error: 'Failed to delete note' });
   }
 });
 
-// POST /api/upload-cover - Upload cover image
+// ─── POST /api/upload-cover ───────────────────────────────────────────────────
+
 app.post('/api/upload-cover', upload.single('cover'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
-    
-    const slug = req.body.slug;
-    if (!slug) {
-      return res.status(400).json({ error: 'Slug is required' });
+
+    const slug = slugify(req.body.slug ?? '');
+    if (!slug || !isValidSlug(slug)) {
+      return res.status(400).json({ error: 'slug is required' });
     }
-    
-    const pngPath = path.join(COVERS_DIR, `${slug}.png`);
-    const webpPath = path.join(COVERS_DIR, `${slug}.webp`);
-    
-    // Process image with sharp
-    const imageBuffer = req.file.buffer;
-    
-    // Create optimized PNG (max 800px width, quality optimization)
-    await sharp(imageBuffer)
-      .resize(800, null, { 
-        withoutEnlargement: true,
-        fit: 'inside'
-      })
-      .png({ 
-        quality: 85,
-        compressionLevel: 9
-      })
-      .toFile(pngPath);
-    
-    // Create optimized WebP (max 800px width, good quality/size balance)
-    await sharp(imageBuffer)
-      .resize(800, null, { 
-        withoutEnlargement: true,
-        fit: 'inside'
-      })
-      .webp({ 
-        quality: 80,
-        effort: 6
-      })
-      .toFile(webpPath);
-    
-    console.log(`✅ Cover images created: ${slug}.png and ${slug}.webp`);
-    
-    res.json({ 
-      message: 'Cover uploaded and optimized',
-      png: `/assets/images/covers/${slug}.png`,
-      webp: `/assets/images/covers/${slug}.webp`
+
+    const buf = req.file.buffer;
+
+    await sharp(buf)
+      .resize(800, null, { withoutEnlargement: true, fit: 'inside' })
+      .png({ quality: 85, compressionLevel: 9 })
+      .toFile(path.join(COVERS_DIR, `${slug}.png`));
+
+    await sharp(buf)
+      .resize(800, null, { withoutEnlargement: true, fit: 'inside' })
+      .webp({ quality: 80, effort: 6 })
+      .toFile(path.join(COVERS_DIR, `${slug}.webp`));
+
+    await log(`Uploaded cover for: ${slug}`);
+    res.json({
+      message: 'Cover uploaded and optimised',
+      png:  `/assets/images/covers/${slug}.png`,
+      webp: `/assets/images/covers/${slug}.webp`,
     });
-  } catch (error) {
-    console.error('Error uploading cover:', error);
-    res.status(500).json({ error: 'Failed to upload cover: ' + error.message });
+  } catch (err) {
+    await log(`ERROR POST /api/upload-cover: ${err.message}`);
+    res.status(500).json({ error: `Failed to upload cover: ${err.message}` });
   }
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`📚 Cookbook CMS running at http://localhost:${PORT}/admin/`);
-  console.log(`   API available at http://localhost:${PORT}/api/`);
+// ─── Start ────────────────────────────────────────────────────────────────────
+
+app.listen(PORT, async () => {
+  await log(`📚 Cookbook CMS running at http://localhost:${PORT}/admin/`);
+  await log(`   API available at http://localhost:${PORT}/api/`);
+  await logStartupPathState();
+  if (!ADMIN_SECRET) {
+    await log('   ⚠️  ADMIN_SECRET not set — API is unprotected. Fine for local use only.');
+  }
 });

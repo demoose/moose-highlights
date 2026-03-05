@@ -1,0 +1,31 @@
+---
+import Footer from '../components/Footer.astro';
+import Head from '../components/Head.astro';
+import Header from '../components/Header.astro';
+import SvgSprite from '../components/SvgSprite.astro';
+
+interface BookMeta {
+  title: string;
+  author: string;
+  png: string;
+}
+
+interface Props {
+  title?: string;
+  book?: BookMeta;
+}
+
+const { title, book } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <Head title={title} book={book} />
+  <body>
+    <SvgSprite />
+    <Header />
+    <main role="main" class="page-wrap">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
